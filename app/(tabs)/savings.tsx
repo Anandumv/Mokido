@@ -30,6 +30,15 @@ export default function SavingsScreen() {
   };
 
   const handleAddFunds = (amount: number, fundType: 'savings' | 'investment' | 'crypto') => {
+    let tokensEarned = 0;
+    let xpEarned = 0;
+    
+    // Award tokens and XP for new investments
+    if (fundType === 'investment') {
+      tokensEarned = Math.floor(amount * 2);
+      xpEarned = Math.floor(amount * 3);
+    }
+    
     // Add transaction record
     const transactionCategory = fundType === 'savings' ? 'Personal Savings' : 
                                fundType === 'investment' ? 'Investment Deposit' : 
@@ -53,7 +62,18 @@ export default function SavingsScreen() {
       case 'investment':
         updateUser({
           investmentBalance: user.investmentBalance + amount,
+          mokTokens: user.mokTokens + tokensEarned,
+          xp: user.xp + xpEarned
         });
+        
+        // Show investment rewards notification
+        setTimeout(() => {
+          Alert.alert(
+            '🎉 Investment Rewards!',
+            `Great job investing! You earned:\n\n🪙 +${tokensEarned} MokTokens\n⚡ +${xpEarned} XP\n\nInvesting helps your money grow and teaches you about building wealth! 💪`,
+            [{ text: 'Awesome! 🌟', style: 'default' }]
+          );
+        }, 1000);
         break;
         
       case 'crypto':
@@ -84,6 +104,22 @@ export default function SavingsScreen() {
         return;
       }
       
+      // Calculate token/XP impact for transfers
+      let tokenChange = 0;
+      let xpChange = 0;
+      
+      // Lose tokens when withdrawing FROM investments
+      if (sourceAccount === 'investment') {
+        tokenChange -= Math.floor(amount * 2);
+        xpChange -= Math.floor(amount * 3);
+      }
+      
+      // Gain tokens when transferring TO investments
+      if (fundType === 'investment') {
+        tokenChange += Math.floor(amount * 2);
+        xpChange += Math.floor(amount * 3);
+      }
+      
       // Deduct from source account
       const sourceUpdate = sourceAccount === 'savings' ? { savings: user.savings - amount } :
                           sourceAccount === 'investment' ? { investmentBalance: user.investmentBalance - amount } :
@@ -94,10 +130,12 @@ export default function SavingsScreen() {
                         fundType === 'investment' ? { investmentBalance: user.investmentBalance + amount } :
                         { cryptoBalance: user.cryptoBalance + amount };
       
-      // Update user with both changes
+      // Update user with both changes and token/XP impact
       updateUser({
         ...sourceUpdate,
-        ...destUpdate
+        ...destUpdate,
+        ...(tokenChange !== 0 && { mokTokens: user.mokTokens + tokenChange }),
+        ...(xpChange !== 0 && { xp: user.xp + xpChange })
       });
       
       // Add transaction records for both sides
@@ -117,9 +155,22 @@ export default function SavingsScreen() {
         date: new Date().toISOString().split('T')[0]
       });
       
+      let alertMessage = `Successfully transferred $${amount.toFixed(2)} from your ${sourceAccount} to ${fundType}!`;
+      
+      if (tokenChange !== 0 || xpChange !== 0) {
+        alertMessage += `\n\n💰 Token Impact:`;
+        if (tokenChange > 0) {
+          alertMessage += `\n🎉 +${tokenChange} MokTokens, +${xpChange} XP (investing funds)`;
+        } else if (tokenChange < 0) {
+          alertMessage += `\n📉 ${tokenChange} MokTokens, ${xpChange} XP (withdrawing from investments)`;
+        }
+      }
+      
+      alertMessage += `\n\nKeep up the great saving habits! 💪`;
+      
       Alert.alert(
         '🔄 Transfer Complete!',
-        `Successfully transferred $${amount.toFixed(2)} from your ${sourceAccount} to ${fundType}!\n\nKeep up the great saving habits! 💪`,
+        alertMessage,
         [{ text: 'Great! 👍', style: 'default' }]
       );
     } else {
@@ -163,9 +214,8 @@ export default function SavingsScreen() {
   };
 
   const handleNavigateToSavings = () => {
-    // Since we're already on the savings screen, we can just scroll to top
-    // or navigate to a specific savings section if needed
-    router.push('/(tabs)/savings');
+    // Since we're already on the savings screen, we don't need to navigate
+    // This function exists for consistency with other screens
   };
 
   // Calculate total goal progress for the progress card

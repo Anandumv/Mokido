@@ -92,7 +92,7 @@ export default function AddFundsModal({ visible, onClose, onAddFunds }: AddFunds
     const numAmount = parseFloat(amount);
     const selectedType = fundTypes.find(type => type.id === selectedFundType);
     
-    onAddFunds(numAmount, selectedFundType!, selectedSourceAccount || undefined);
+    handleAddFundsWithRewards(numAmount, selectedFundType!, selectedSourceAccount || undefined);
     
     const transferText = isTransfer && selectedSourceAccount 
       ? ` transferred from your ${fundTypes.find(t => t.id === selectedSourceAccount)?.name}`
@@ -110,6 +110,35 @@ export default function AddFundsModal({ visible, onClose, onAddFunds }: AddFunds
   const getFundTypeColor = (fundType: string) => {
     const type = fundTypes.find(t => t.id === fundType);
     return type?.color || '#6B7280';
+  };
+
+  const handleAddFundsWithRewards = (amount: number, fundType: 'savings' | 'investment' | 'crypto', sourceAccount?: 'savings' | 'investment' | 'crypto') => {
+    if (sourceAccount) {
+      // This is a transfer - use existing transfer logic
+      handleAddFundsWithTransfer(amount, fundType, sourceAccount);
+    } else {
+      // This is adding new money
+      if (fundType === 'investment') {
+        // Award tokens and XP for new investments
+        const tokensEarned = Math.floor(amount * 2);
+        const xpEarned = Math.floor(amount * 3);
+        
+        // Call the original handler
+        onAddFunds(amount, fundType, sourceAccount);
+        
+        // Show rewards notification
+        setTimeout(() => {
+          Alert.alert(
+            '🎉 Investment Rewards!',
+            `Great job investing! You earned:\n\n🪙 +${tokensEarned} MokTokens\n⚡ +${xpEarned} XP\n\nInvesting helps your money grow and teaches you about building wealth! 💪`,
+            [{ text: 'Awesome! 🌟', style: 'default' }]
+          );
+        }, 500);
+      } else {
+        // Regular savings or crypto - no special rewards
+        onAddFunds(amount, fundType, sourceAccount);
+      }
+    }
   };
 
   return (

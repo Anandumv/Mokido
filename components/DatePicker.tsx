@@ -32,7 +32,7 @@ export default function DatePicker({
 
   const formatDisplayDate = (dateString: string): string => {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    const date = new Date(dateString + 'T00:00:00');
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -98,7 +98,7 @@ export default function DatePicker({
   const isSelectedDay = (day: number) => {
     if (!day || !value) return false;
     
-    const valueDate = new Date(value);
+    const valueDate = new Date(value + 'T00:00:00');
     return (
       day === selectedDate.getDate() &&
       selectedDate.getMonth() === valueDate.getMonth() &&

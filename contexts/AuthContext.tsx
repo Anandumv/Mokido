@@ -484,8 +484,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleParentMode = async () => {
-    if (user) {
+    if (!user) return;
+    
+    try {
       await updateUser({ isParentMode: !user.isParentMode });
+    } catch (error) {
+      console.error('Error toggling parent mode:', error);
+      throw error;
     }
   };
 

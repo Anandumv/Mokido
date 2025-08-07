@@ -392,7 +392,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateGoal = async (id: string, updates: Partial<Goal>) => {
     if (!user) return;
 
-    try {
+    const result = await withErrorHandling(
+      async () => {
       const dbUpdates: any = {};
       
       if (updates.title !== undefined) dbUpdates.title = updates.title;
@@ -410,19 +411,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
         .eq('id', id)
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error updating goal:', error);
+          throw new Error(`Failed to update goal: ${error.message}`);
         return;
       }
-
+        return true;
+      },
+      { 
+        action: 'updateGoal', 
+        component: 'DataContext',
+        userId: user.id,
+        additionalData: { goalId: id, updates }
+      },
+      false
+    );
       // Update local state
+    if (result.success) {
+      // Update local state only if database update succeeded
       setGoals(prev => 
         prev.map(goal => 
           goal.id === id ? { ...goal, ...updates } : goal
         )
       );
-    } catch (error) {
-      console.error('Error in updateGoal:', error);
     }
   };
 

@@ -439,12 +439,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 6,
   },
-  helperText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-    marginTop: 6,
-  },
   registerButton: {
     borderRadius: 16,
     marginTop: 8,

@@ -59,6 +59,34 @@ export default function MissionsScreen() {
                       updateUser({
                         mokTokens: user.mokTokens + reward,
                         xp: user.xp + xpReward
+    const xpReward = Math.floor(reward * 1.5);
+    const difficultyEmoji = difficulty === 'Easy' ? '🌟' : difficulty === 'Medium' ? '⭐' : '🏆';
+
+    Alert.alert(
+      `${difficultyEmoji} Start Mission`,
+      `Ready to start "${title}"?\n\n🎯 Difficulty: ${difficulty}\n💰 Reward: ${reward} MokTokens\n⚡ XP: ${xpReward}\n\nTap "Start Mission" when you're ready to begin!`,
+      [
+        { text: 'Not Yet', style: 'cancel' },
+        {
+          text: 'Start Mission! 🚀',
+          style: 'default',
+          onPress: () => {
+            setCompletingMission(missionId);
+            
+            // Simulate mission progress with a timer
+            setTimeout(() => {
+              Alert.alert(
+                '🎉 Mission Complete!',
+                `Awesome job completing "${title}"!\n\n🎁 You earned:\n💰 ${reward} MokTokens\n⚡ ${xpReward} XP\n\nKeep up the great work! 🌟`,
+                [
+                  {
+                    text: 'Collect Rewards! ✨',
+                    style: 'default',
+                    onPress: () => {
+                      updateMission(missionId, { completed: true });
+                      updateUser({
+                        mokTokens: user.mokTokens + reward,
+                        xp: user.xp + xpReward
                       });
                       setCompletingMission(null);
                       

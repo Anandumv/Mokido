@@ -166,11 +166,11 @@ export default function ProfileScreen() {
               </View>
               
               <View style={styles.singleStatRow}>
-                <TouchableOpacity style={styles.statCard} onPress={handleNavigateToBadges}>
+                <View style={styles.statCard}>
                   <Plane color="#F59E0B" size={24} />
                   <Text style={styles.statValue}>{user.travelMiles.toFixed(1)}</Text>
                   <Text style={styles.statLabel}>Travel Miles</Text>
-                </TouchableOpacity>
+                </View>
               </View>
             </View>
           ) : (
@@ -307,7 +307,7 @@ export default function ProfileScreen() {
 
           {/* Mode Toggle */}
           <View style={styles.section}>
-            <TouchableOpacity style={styles.modeToggle} onPress={toggleParentMode}>
+            <TouchableOpacity style={styles.modeToggle} onPress={handleModeToggle}>
               <View style={styles.modeToggleContent}>
                 <Text style={styles.modeToggleEmoji}>
                   {user.isParentMode ? '👨‍👩‍👧‍👦' : '👶'}

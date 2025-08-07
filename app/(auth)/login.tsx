@@ -65,7 +65,13 @@ export default function LoginScreen() {
       <SafeAreaView style={styles.safeArea}>
         {/* Header with Back Button */}
         <View style={styles.headerContainer}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft color="#FFFFFF" size={24} />
+          </TouchableOpacity>
+          <View style={styles.securityIndicator}>
+            <Shield color="#FFFFFF" size={16} />
             <Text style={styles.securityText}>Secure Login</Text>
+          </View>
         </View>
 
           <ScrollView 
@@ -215,15 +221,13 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 20,
     paddingBottom: 10,
   },
   backButton: {
-    position: 'absolute',
-    left: 24,
-    top: 20,
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -233,9 +237,6 @@ const styles = StyleSheet.create({
     backdropFilter: 'blur(10px)',
   },
   securityIndicator: {
-    position: 'absolute',
-    right: 24,
-    top: 26,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
